@@ -62,6 +62,7 @@ def add_blog(request):
             fr=form.save(commit=False)
             fr.user = request.user
             fr.save()
+            messages.success(request, 'added successfully')
             return redirect('home')
     return render(request, 'blog.html', {'form': form})
 
@@ -69,13 +70,13 @@ def update_blog(request,pk):
     check=authentication_library(request)  
     if not check:
         return redirect('user-login')
-    
     blog_obj = blog.objects.get(pk=pk)
     form = AddBlog(instance=blog_obj)
     if request.method == 'POST':
         form = AddBlog(request.POST , instance=blog_obj)
         if form.is_valid():
             form.save()
+            messages.success(request, 'updated successfully')
             return redirect('profile')
     return render(request, 'blog.html', {'form': form})    
 
@@ -84,6 +85,7 @@ def delete_blog(request,pk):
     if not check:
         return redirect('user-login')
     blog_obj = blog.objects.get(pk=pk)
+    messages.success(request, f'Your blog {blog_obj.title} deleted successfully')
     blog_obj.delete()
     messages.success(request, 'deleted successfully')
     return redirect('profile')

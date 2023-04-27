@@ -7,13 +7,7 @@
        
         <div class="col-md-5 shadow p-4  mt-5">
            
-          {% if messages %}
-                      {% for message in messages %}
-                                <div class="alert alert-info">
-                                    {{ message }}
-                                </div>
-                      {% endfor %}
-          {% endif %}
+          
           <form method="post">
             <h4>Register Now</h4>
             {% csrf_token %}
