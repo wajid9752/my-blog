@@ -4,15 +4,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login , logout
 from django.contrib import messages
 from .forms import *
+from custom_lib import login_lib , authentication_library
 # Create your views here.
-
+   
 
 def home(request):
     all_blogs= blog.objects.all().order_by('-date')
     return render(request, 'home.html', {'all_blogs': all_blogs})
    
-
-
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -32,7 +31,8 @@ def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+        # user = authenticate(request, username=username, password=password)
+        user=login_lib(username,password)
         if user is not None:
             login(request, user)
             messages.success(request, 'You have been logged in')
@@ -49,7 +49,12 @@ def log_out(request):
     return redirect('home')
 
 
+
 def add_blog(request):
+    check=authentication_library(request)  
+    if not check:
+        return redirect('user-login')
+    
     form = AddBlog()
     if request.method == 'POST':
         form = AddBlog(request.POST)
@@ -60,11 +65,11 @@ def add_blog(request):
             return redirect('home')
     return render(request, 'blog.html', {'form': form})
 
-
-
-
-
 def update_blog(request,pk):
+    check=authentication_library(request)  
+    if not check:
+        return redirect('user-login')
+    
     blog_obj = blog.objects.get(pk=pk)
     form = AddBlog(instance=blog_obj)
     if request.method == 'POST':
@@ -75,6 +80,9 @@ def update_blog(request,pk):
     return render(request, 'blog.html', {'form': form})    
 
 def delete_blog(request,pk):
+    check=authentication_library(request)  
+    if not check:
+        return redirect('user-login')
     blog_obj = blog.objects.get(pk=pk)
     blog_obj.delete()
     messages.success(request, 'deleted successfully')
@@ -82,5 +90,9 @@ def delete_blog(request,pk):
 
 
 def profile(request):
+    check=authentication_library(request)  
+    if not check:
+        return redirect('user-login') 
+    
     all_blogs= blog.objects.filter(user=request.user)
     return render(request, 'profile.html', {'all_blogs': all_blogs})    
